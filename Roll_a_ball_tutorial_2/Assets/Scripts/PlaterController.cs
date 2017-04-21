@@ -11,6 +11,12 @@ public class PlaterController : MonoBehaviour {
 	private Rigidbody rb;
     private int count;
 
+	public int jumpForce;
+
+	bool canJump = true;
+
+    Vector3 currentCheckpoint = new Vector3(0, 0.5f, 0);
+
 	void Start ()
 	{
 		rb = GetComponent<Rigidbody>();
@@ -27,6 +33,18 @@ public class PlaterController : MonoBehaviour {
 		Vector3 movement = new Vector3 (moveHorizontal, 0.0f, moveVertical);
 
 		rb.AddForce (movement * speed);
+
+		if (Input.GetKeyDown (KeyCode.Space)) {
+			Jump ();
+		}
+	}
+
+	void Jump()
+	{
+		if (canJump) {
+			rb.AddForce (Vector3.up * jumpForce);
+			canJump = false;
+		}
 	}
 
     void OnTriggerEnter(Collider other)
@@ -37,12 +55,22 @@ public class PlaterController : MonoBehaviour {
             count += 1;
             SetCountText();
         }
+        else if (other.gameObject.CompareTag("Killzone"))
+        {
+            transform.position = currentCheckpoint;
+        }
+        
     }
+
+	void OnCollisionEnter(Collision other)
+	{
+		canJump = true;
+	}
 
     void SetCountText ()
     {
         countText.text = "Count: " + count.ToString();
-        if (count >= 11)
+        if (count >= 12)
         {
             winText.text = "You Win!";
         }
